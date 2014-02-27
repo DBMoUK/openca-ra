@@ -8,6 +8,7 @@ class openca-ra::install {
     owner   => 'openca',
     group   => 'openca',
     require => User['openca'],
+    before  => Exec['build-openca-tools'],
   }
 
   file { '/downloads':
