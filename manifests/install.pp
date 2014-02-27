@@ -3,6 +3,13 @@ class openca-ra::install {
 
   $curl_option = "--insecure"
 
+  file { '/home/openca':
+    ensure  => directory,
+    owner   => 'openca',
+    group   => 'openca',
+    require => User['openca'],
+  }
+
   file { '/downloads':
     ensure => directory,
   }
@@ -11,14 +18,14 @@ class openca-ra::install {
     curl_option => $curl_option,
     source      => 'https://pki.openca.org/cgi-bin/download?target=openca-base-1.5.0.tar.gz',
     target      => '/home/openca/openca-base-1.5.0.tar.gz',
-    require     => User['openca']
+    require     => File['/home/openca']
   }
 
   staging::file { 'openca-tools-1.3.0.tar.gz':
     curl_option => $curl_option,
     source      => 'https://pki.openca.org/cgi-bin/download?target=openca-tools-1.3.0.tar.gz',
     target      => '/home/openca/openca-tools-1.3.0.tar.gz',
-    require     => User['openca'] 
+    require     => File['/home/openca'] 
   }
 
   staging::extract { 'openca-base-1.5.0.tar.gz':
