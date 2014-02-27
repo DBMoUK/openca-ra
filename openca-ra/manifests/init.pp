@@ -102,6 +102,7 @@ class openca-ra {
     provider => shell,
     command  => "bash -c 'cd /opt/openca/etc/openca; ./configure_etc.sh'",
     before   => Service['openca'], 
+    require  => Exec['build-openca'],
   }
  
   service { 'openca':
@@ -112,12 +113,4 @@ class openca-ra {
     hasstatus  => true,
   }
 
- file { '/opt/openca/etc/openca/':
-   ensure  => present, 
-   mode    => '0750',
-   owner   => 'openca',
-   group   => 'apache',
-   recurse => true,
-   before  => Service['openca'],
- }  
 }

@@ -3,11 +3,9 @@ version '0.1.0'
 source 'UNKNOWN'
 author 'dbmo'
 license 'Apache License, Version 2.0'
-summary 'OpenCA Registration Authority / CA Suite'
-description 'OpenCA Registration Authority / CA Suite'
-project_page 'https://github.com/DBMoUK/openca-ra'
+summary 'UNKNOWN'
+description 'UNKNOWN'
+project_page 'UNKNOWN'
 
-dependency 'puppetlabs/apache', '>= 0.11.0'
-dependency 'puppetlabs/mysql',  '>= 2.2.1'
-dependency 'nanliu/staging',    '>= 0.4.0'
-
+## Add dependencies, if any:
+# dependency 'username/name', '>= 1.2.0'
