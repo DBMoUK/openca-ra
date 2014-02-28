@@ -1,4 +1,4 @@
-class openca-ra::install {
+class openca::install {
   include staging
 
   $curl_option = "--insecure"

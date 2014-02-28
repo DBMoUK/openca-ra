@@ -1,0 +1,28 @@
+<VirtualHost *:80>
+        ServerAdmin casupport@puppetlabs.com
+        ServerName <%= @FQDN %>
+        DocumentRoot "/var/www/pki"
+
+        <Directory />
+                Options -Indexes FollowSymLinks MultiViews
+                AllowOverride None
+        </Directory>
+
+        ScriptAlias /cgi-bin/ /var/www/cgi-bin/
+        <Directory "/var/www/cgi-bin/">
+                AllowOverride None
+                Options +ExecCGI -Indexes -MultiViews +SymLinksIfOwnerMatch
+                Order allow,deny
+                Allow from all
+        </Directory>
+
+
+        ErrorLog "${APACHE_LOG_DIR}/openca-error.log"
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel warn
+
+        CustomLog "${APACHE_LOG_DIR}/openca.log" combined
+
+</VirtualHost>

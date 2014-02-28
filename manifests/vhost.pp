@@ -1,4 +1,4 @@
-class openca-ra::vhost {
+class openca::vhost {
   include apache
 
   file { ['/var/www', '/var/www/html']:

@@ -1,8 +1,8 @@
-class openca-ra::db {
+class openca::db {
 
   #  file { '/etc/my.cnf':
   # ensure => file,
-  #  content => template('openca-ra/my.cnf.erb'),
+  #  content => template('openca/my.cnf.erb'),
   #  before => Exec['/usr/bin/mysql_install_db'],
   #}
   exec { '/usr/bin/mysql_install_db':

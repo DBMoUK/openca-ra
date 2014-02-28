@@ -1,4 +1,4 @@
-# == Class: openca-ra
+# == Class: openca
 #
 # Sets up Registration Authority Node for OpenCA.
 #
@@ -10,7 +10,7 @@
 #
 # === Examples
 #
-#  class { openca-ra:
+#  class { openca:
 #  }
 #
 # === Authors
@@ -21,12 +21,13 @@
 #
 # Copyright 2014 David Bryant-Moore, unless otherwise noted.
 #
-class openca-ra {
+class openca {
   include stdlib
-  include openca-ra::vhost
-  include openca-ra::install
-  include openca-ra::db
-  include openca-ra::build
+  include openca::vhost
+  include openca::install
+  include openca::db
+  include openca::build
+  include openca::ext_modules
   include mysql::server
 
   ensure_packages(
@@ -74,8 +75,16 @@ class openca-ra {
     owner  => 'root',
     group  => 'root',
     mode   => '0755',
-    source => 'puppet:///modules/openca-ra/openca.sh',
+    source => 'puppet:///modules/openca/openca.sh',
     before => Service['openca'], 
+  }
+
+  file { '/etc/httpd/conf/vhost.conf':
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    content => template('openca/vhost.conf.erb'),
+    notify  => Service['httpd'],
   }
 
   exec { 'set-ownership-apache-logs':
@@ -88,7 +97,7 @@ class openca-ra {
     ensure  => file,
     owner   => 'openca',
     group   => 'openca',
-    source  => 'puppet:///modules/openca-ra/config.xml',
+    source  => 'puppet:///modules/openca/config.xml',
     before  => File['/var/www/cgi-binpki'],
     require => User['openca'],
   }
@@ -98,10 +107,13 @@ class openca-ra {
     target => '/var/www/cgi-bin/pki',
     before => Service['openca'],
   }
+
   exec {'setup-openca-config':
     provider => shell,
-    command  => "bash -c 'cd /opt/openca/etc/openca; ./configure_etc.sh'",
+    command  => "bash -c 'cd /opt/openca/etc/openca; 
+                 ./configure_etc.sh'",
     before   => Service['openca'], 
+    require  => Exec['build-openca'],
   }
  
   service { 'openca':
@@ -112,12 +124,4 @@ class openca-ra {
     hasstatus  => true,
   }
 
- file { '/opt/openca/etc/openca/':
-   ensure  => present, 
-   mode    => '0750',
-   owner   => 'openca',
-   group   => 'apache',
-   recurse => true,
-   before  => Service['openca'],
- }  
 }
