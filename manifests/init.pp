@@ -1,5 +1,4 @@
 # == Class: openca
-#
 # Sets up Registration Authority Node for OpenCA.
 #
 # === Parameters
@@ -27,8 +26,9 @@ class openca {
   include openca::install
   include openca::db
   include openca::build
-  include openca::ext_modules
   include mysql::server
+
+  # Include required classes.
 
   ensure_packages(
     [
@@ -50,25 +50,22 @@ class openca {
      'php-mysql'
     ]
   )
-  
+
+  # Ensure required packages are present.
+
   user { 'openca':
     ensure     => present,
     groups     => 'openca',
     managehome => true,
   }
 
+  # Manage openca user, ensure perl modules get installed first.
+
   group { 'openca':
     ensure => present,
   }
 
-  user { 'madwolf':
-    ensure => present,
-    groups => 'madwolf',
-  }
-
-  group { 'madwolf':
-    ensure => present,
-  }
+  # Manage openca group.
 
   file { '/etc/init.d/openca.sh':
     ensure => file,
@@ -76,22 +73,28 @@ class openca {
     group  => 'root',
     mode   => '0755',
     source => 'puppet:///modules/openca/openca.sh',
-    before => Service['openca'], 
+    before => Service['openca'],
   }
+
+  # Manage openca init script.
 
   file { '/etc/httpd/conf/vhost.conf':
     ensure  => file,
     owner   => 'root',
     group   => 'root',
     content => template('openca/vhost.conf.erb'),
-    notify  => Service['httpd'],
+    require => Service['httpd'],
   }
+
+  # Manage virtual host for Apache to serve OpenCA.
 
   exec { 'set-ownership-apache-logs':
     provider => shell,
     command  => "bash -c 'chown -R apache:apache /opt/openca/var/openca/log'",
     before   => File['/opt/openca/etc/openca/config.xml'],
   }
+
+  # Set ownership on Apache logs in OpenCA directory tree.
 
   file { '/opt/openca/etc/openca/config.xml':
     ensure  => file,
@@ -102,20 +105,26 @@ class openca {
     require => User['openca'],
   }
 
+  # Manage OpenCA config.xml file with baked settings.
+
   file { '/var/www/cgi-binpki':
     ensure => link,
     target => '/var/www/cgi-bin/pki',
     before => Service['openca'],
   }
 
+  # Manage symlink for cgi-bin due to bug in OpenCA.
+
   exec {'setup-openca-config':
     provider => shell,
-    command  => "bash -c 'cd /opt/openca/etc/openca; 
+    command  => "bash -c 'cd /opt/openca/etc/openca;
                  ./configure_etc.sh'",
-    before   => Service['openca'], 
+    before   => Service['openca'],
     require  => Exec['build-openca'],
   }
- 
+
+  # Manage OpenCA configure script after OpenCA has built.
+
   service { 'openca':
     path       => '/etc/init.d/openca.sh',
     start      => '/etc/init.d/openca.sh start',
@@ -123,5 +132,7 @@ class openca {
     hasrestart => true,
     hasstatus  => true,
   }
+
+  # Manage OpenCA service.
 
 }

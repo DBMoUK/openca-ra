@@ -8,7 +8,9 @@ class openca::build {
     before  => Exec['build-openca-tools'],
     require => User['openca'],
   }
-  
+ 
+  # Manage shell script to build OpenCA tools.
+
   file { '/home/openca/build-opencabase.sh':
     owner   => 'openca',
     group   => 'openca',
@@ -17,6 +19,8 @@ class openca::build {
     require => User['openca'],
   }
 
+  # Manage shell script to build OpenCA base.
+
   exec { 'build-openca-tools':
     provider => shell,
     command  => "bash -c 'cd /home/openca;
@@ -24,13 +28,18 @@ class openca::build {
     require => Staging::Extract['openca-tools-1.3.0.tar.gz'],
     before  => Exec['build-openca'],
   }
-  
+ 
+  # Build OpenCA tools.
+
   exec { 'build-openca':
     provider => shell,
     command  => "bash -c 'cd /home/openca;
                  ./build-opencabase.sh'",
-    require  => File['/home/openca/openca-base-1.5.0/src/ext-modules/XML-Twig-3.44.tar.gz'],
+    require  => Exec['build-openca-tools'],
     before   => Exec['set-ownership-apache-logs'],
   }
 
-}
+  # Build OpenCA Base.
+
+
+  }

@@ -8,3 +8,4 @@ class openca::vhost {
     require => User['openca'],
   }
 }
+  # Setup Apache Virtual Host for OpenCA.
